@@ -1,6 +1,26 @@
 # grunt-symfony-dev-assets
 
-> Create twig two templates. The first one contain all js assets and second one css assets
+If you use bower and bower_concat. In dev env you're probably want use not concatenated and minified version libs
+
+So we generate twig templates which contain all bower libs and css as asset and comment minified prod version.
+
+e.g
+{# this typical js block which contain js assets
+
+{% twig %}
+
+  {% javascript %}
+      {# in this template list of libs assets; also it start regular html comment #}
+      {% include 'js-dev-template.start.twig' ignore missing %}
+        {# this is contactenated file; it will be loaded only if templates dont exist #}
+          <script src="{{ asset('scripts/lib.js') }}"></script>
+          {# you able to add some other scripts which will commented in dev env #}
+      {# in this template end of regular html comment #}
+      {% include 'js-dev-template.end.twig' ignore missing %}
+
+
+{% endblock %}
+
 
 ## Getting Started
 This plugin requires Grunt `~0.4.5`
@@ -24,66 +44,60 @@ In your project's Gruntfile, add a section named `symfony_dev_assets` to the dat
 
 ```js
 grunt.initConfig({
-  symfony_dev_assets: {
-    options: {
-      // Task-specific options go here.
-    },
-    your_target: {
-      // Target-specific file lists and/or options go here.
-    },
-  },
+      symfony_dev_assets: {
+        build: {
+          js: {
+            name: 'js-dev-template',
+            destTemplate: '<%= config.templates %>',
+            mainFiles: {
+              'bootstrap': ['dist/js/bootstrap.js'],
+              'slick-carousel': ['slick/slick.js']
+            }
+          },
+          css: {
+            name: 'css-dev-template',
+            destTemplate: '<%= config.templates %>',
+            mainFiles: {
+              'bootstrap': ['dist/css/bootstrap.css']
+            },
+            additionalFiles: ['<%= config.dist %>/styles/main.css']
+          },
+          libDir:
+          {
+            cwd : '<%= config.dist %>/',
+            dir : 'libs/'
+          }
+        }
+      }
 });
 ```
-
-### Options
-
-#### options.separator
-Type: `String`
-Default value: `',  '`
-
-A string value that is used to do something with whatever.
-
-#### options.punctuation
-Type: `String`
-Default value: `'.'`
-
-A string value that is used to do something else with whatever else.
 
 ### Usage Examples
-
+ TODO
+ 
+ tip. add two grunt task e.g build and dist like that:
+ 
+ grunt.registerTask('build', [
+     'clean:dist', clean directories see grunt-contrib-clean
+     'clean:templates',  clean directories see grunt-contrib-clean
+     'bower',
+     'copy:copyBowerLibs', // copy libraries in directory see grunt-contrib-copy
+     'symfony_dev_assets',
+   ]);
+ 
+ 
+   grunt.registerTask('dist', [
+     'clean:dist',
+     'clean:templates',
+     'bower:dist',
+     'bower_concat',
+     'postcss',
+     'cssmin'
+   ]);
+ };
+ 
+ in first task we are get dev env in second one prod.
 #### Default Options
-In this example, the default options are used to do something with whatever. So if the `testing` file has the content `Testing` and the `123` file had the content `1 2 3`, the generated result would be `Testing, 1 2 3.`
-
-```js
-grunt.initConfig({
-  symfony_dev_assets: {
-    options: {},
-    files: {
-      'dest/default_options': ['src/testing', 'src/123'],
-    },
-  },
-});
-```
-
-#### Custom Options
-In this example, custom options are used to do something else with whatever else. So if the `testing` file has the content `Testing` and the `123` file had the content `1 2 3`, the generated result in this case would be `Testing: 1 2 3 !!!`
-
-```js
-grunt.initConfig({
-  symfony_dev_assets: {
-    options: {
-      separator: ': ',
-      punctuation: ' !!!',
-    },
-    files: {
-      'dest/default_options': ['src/testing', 'src/123'],
-    },
-  },
-});
-```
-
-## Contributing
-In lieu of a formal styleguide, take care to maintain the existing coding style. Add unit tests for any new or changed functionality. Lint and test your code using [Grunt](http://gruntjs.com/).
-
+TODO
 ## Release History
 _(Nothing yet)_
